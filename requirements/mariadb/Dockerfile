@@ -16,7 +16,6 @@ ENV MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
 ENV MYSQL_DATABASE=${MYSQL_DB}
 ENV MYSQL_USER=${MYSQL_USER}
 ENV MYSQL_PASSWORD=${MYSQL_PASS}
-	
 
 COPY 50-server.cnf /etc/mysql/mariadb.conf.d/.
 COPY init.sql /etc/mysql/init.sql
