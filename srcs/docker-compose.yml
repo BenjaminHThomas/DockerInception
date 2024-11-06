@@ -10,6 +10,7 @@ services:
       - "443:443"
     volumes:
       - ./web:/var/www/html
+    pull_policy: never
     restart: always
   
   wordpress:
@@ -33,11 +34,14 @@ services:
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
+    pull_policy: never
     restart: always
 
   mariadb:
     networks:
       - inception
+    volumes:
+      - db:/var/lib/mysql
     build: 
       context: requirements/mariadb
       dockerfile: "Dockerfile"
@@ -47,6 +51,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
+    pull_policy: never
     restart: always
   
   redis:
@@ -56,7 +61,41 @@ services:
       context: requirements/bonus/redis
       dockerfile: "Dockerfile"
     container_name: redis
+    pull_policy: never
     restart: always
+  
+  ftp:
+    networks:
+      - inception
+    build:
+      context: requirements/bonus/ftp
+      dockerfile: "Dockerfile"
+      args:
+        FTP_USER: ${FTP_USER}
+        FTP_PASS: ${FTP_PASS}
+        FTP_ROOT: ${FTP_ROOT}
+    container_name: ftp
+    pull_policy: never
+    volumes:
+      - web:/web_data
+    ports:
+      - "20-21:20-21"
+      - "30000-30100:30000-30100"
+    restart: always
+
+volumes:
+  web:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/data/web
+      o: bind
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOME}/data/db
+      o: bind
 
 networks:
   inception:
