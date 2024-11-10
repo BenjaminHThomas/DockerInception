@@ -8,7 +8,8 @@ build:
 	docker compose -f ${YML} up
 
 down:
-	docker colume prune --force
+	docker volume prune --force
 	docker compose -f ${YML} down -v --remove-orphans
 	sudo rm -rf ${WEB}
 	sudo rm -rf ${DB}
+	sudo rm -rf ./srcs/web
