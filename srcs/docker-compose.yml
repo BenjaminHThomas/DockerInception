@@ -9,7 +9,7 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./web:/var/www/html
+      - web:/var/www/html
     pull_policy: never
     restart: always
   
@@ -21,7 +21,7 @@ services:
       dockerfile: "Dockerfile"
     container_name: wp-php
     volumes:
-      - ./web:/var/www/html
+      - web:/var/www/html
     environment:
       WORDPRESS_DB_HOST: mariadb
       WORDPRESS_SITE_URL: ${WORDPRESS_SITE_URL}

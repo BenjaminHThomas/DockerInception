@@ -12,4 +12,3 @@ down:
 	docker compose -f ${YML} down -v --remove-orphans
 	sudo rm -rf ${WEB}
 	sudo rm -rf ${DB}
-	sudo rm -rf ./srcs/web
