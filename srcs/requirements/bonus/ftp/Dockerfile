@@ -2,26 +2,33 @@ FROM debian:bullseye
 
 ARG FTP_USER
 ARG FTP_PASS
-ARG FTP_ROOT
 
-# install and delete temp files
-RUN apt update && apt upgrade -y && apt install -y \
-    vsftpd && \
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y vsftpd procps net-tools && \
     rm -rf /var/lib/apt/lists/*
 
-# configure ftp server
-RUN mkdir -p /var/run/vsftpd/empty ${FTP_ROOT} && \
-    chmod 777 /var/run/vsftpd/empty && \
-    chmod 777 ${FTP_ROOT}
+RUN mkdir -p /var/run/vsftpd/empty && \
+    chmod 755 /var/run/vsftpd/empty && \
+    mkdir -p /web_data && \
+    chmod 755 /web_data
 
-# add ftp user and set permissions
-RUN useradd -d ${FTP_ROOT} -G www-data ${FTP_USER} && \
+# add FTP user and set permissions
+RUN useradd -m -d /web_data -G www-data ${FTP_USER} && \
+    chown -R ${FTP_USER}:www-data /web_data && \
     echo "${FTP_USER}:${FTP_PASS}" | chpasswd && \
-    chown -R ${FTP_USER}:www-data ${FTP_ROOT}
+    chmod 755 /web_data
 
-# copy config file
+# create log files and set permissions
+RUN touch /var/log/vsftpd.log && \
+    chmod 644 /var/log/vsftpd.log
+
 COPY vsftpd.conf /etc/vsftpd.conf
+RUN chmod 644 /etc/vsftpd.conf
+
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 EXPOSE 20 21 30000-30100
 
-CMD ["/usr/sbin/vsftpd", "/etc/vsftpd.conf"]
+CMD ["/start.sh"]
