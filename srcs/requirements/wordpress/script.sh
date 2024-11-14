@@ -19,6 +19,7 @@ wp core install --url="$WORDPRESS_SITE_URL" --title="$WORDPRESS_SITE_TITLE" --ad
     --admin_password="$WORDPRESS_ADM_PASS" \
     --admin_email="$WORDPRESS_ADMIN_EMAIL" \
     --skip-email --allow-root
+wp theme install astra --activate --allow-root
 wp plugin install redis-cache --activate --allow-root
 wp redis enable --allow-root
 wp user create "${WORDPRESS_USERNAME}" "${WORDPRESS_EMAIL}" --user_pass="${WORDPRESS_PASS}" --role=subscriber --allow-root

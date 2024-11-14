@@ -1,9 +1,6 @@
 #!/bin/bash
 set -eo pipefail
 
-mkdir -p /run/mysqld
-chown -R mysql:mysql /run/mysqld
-
 if [ ! -d "/var/lib/mysql/is_init" ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
