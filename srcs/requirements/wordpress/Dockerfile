@@ -14,14 +14,21 @@ RUN apt update && apt upgrade -y && apt install -y \
 	php7.4-gd \ 
 	php7.4-cli \
 	php7.4-mbstring \
-	&& rm -rf /var/lib/apt/lists/*
+	default-mysql-client && \
+	php-fpm7.4 --version
 
-RUN mkdir -p /run/php
+RUN mkdir -p /var/www/html/wordpress && \
+	chmod -R 755 /var/www/html/wordpress && \
+	chown -R www-data:www-data /var/www/html/wordpress && \
+	mkdir -p /run/php
 
-COPY www.conf /etc/php/7.4/fpm/pool.d/.
-COPY script.sh .
-RUN chmod +x script.sh
+WORKDIR /var/www/html/wordpress
+
+
+RUN sed -i 's|^listen = /run/php/php7.4-fpm.sock|listen = 0.0.0.0:9000|' /etc/php/7.4/fpm/pool.d/www.conf
+COPY ./script.sh /usr/local/bin/wp_config.sh
+RUN chmod +x /usr/local/bin/wp_config.sh
 
 EXPOSE 9000
 
-CMD ["./script.sh"]
+CMD ["/usr/local/bin/wp_config.sh"]

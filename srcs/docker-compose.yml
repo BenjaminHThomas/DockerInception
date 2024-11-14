@@ -5,12 +5,15 @@ services:
     build:
       context: requirements/nginx
       dockerfile: "Dockerfile"
+    image: nginx
+    pull_policy: never
     container_name: nginx
+    depends_on:
+      - wordpress
     ports:
       - "443:443"
     volumes:
       - web:/var/www/html
-    pull_policy: never
     restart: always
   
   wordpress:
@@ -19,22 +22,31 @@ services:
     build: 
       context: requirements/wordpress
       dockerfile: "Dockerfile"
-    container_name: wp-php
+    image: wordpress
+    container_name: wordpress
+    pull_policy: never
+    depends_on:
+      - mariadb
+      - redis
     volumes:
       - web:/var/www/html
     environment:
       WORDPRESS_DB_HOST: mariadb
       WORDPRESS_SITE_URL: ${WORDPRESS_SITE_URL}
+
       WORDPRESS_SITE_TITLE: ${WORDPRESS_SITE_TITLE}
       WORDPRESS_ADM_USER: ${WORDPRESS_ADM_USER}
       WORDPRESS_ADM_PASS: ${WORDPRESS_ADM_PASS}
       WORDPRESS_ADMIN_EMAIL: ${WORDPRESS_ADMIN_EMAIL}
 
+      WORDPRESS_USERNAME: ${WORDPRESS_USERNAME}
+      WORDPRESS_PASS: ${WORDPRESS_PASS}
+      WORDPRESS_EMAIL: ${WORDPRESS_EMAIL}
+
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
-    pull_policy: never
     restart: always
 
   mariadb:
@@ -45,13 +57,14 @@ services:
     build: 
       context: requirements/mariadb
       dockerfile: "Dockerfile"
+    image: mariadb
+    pull_policy: never
     container_name: mariadb
     environment:
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
-    pull_policy: never
     restart: always
   
   redis:
@@ -60,27 +73,9 @@ services:
     build: 
       context: requirements/bonus/redis
       dockerfile: "Dockerfile"
+    image: redis
+    pull_policy: never
     container_name: redis
-    pull_policy: never
-    restart: always
-  
-  ftp:
-    networks:
-      - inception
-    build:
-      context: requirements/bonus/ftp
-      dockerfile: "Dockerfile"
-      args:
-        FTP_USER: ${FTP_USER}
-        FTP_PASS: ${FTP_PASS}
-        FTP_ROOT: ${FTP_ROOT}
-    container_name: ftp
-    pull_policy: never
-    volumes:
-      - web:/web_data
-    ports:
-      - "20-21:20-21"
-      - "30000-30100:30000-30100"
     restart: always
 
 volumes:

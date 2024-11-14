@@ -4,8 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y && apt install -y \
 	mariadb-server \
-	gosu \
-	&& rm -rf /var/lib/apt/lists/*
+	gosu
 
 RUN sed -i 's/^bind-address\s*=.*$/bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
 
