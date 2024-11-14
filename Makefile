@@ -5,7 +5,7 @@ DB = ${HOME}/data/db
 build:
 	mkdir -p ${WEB}
 	mkdir -p ${DB}
-	docker compose -f ${YML} up
+	docker compose -f ${YML} up --build
 
 down:
 	docker volume prune --force

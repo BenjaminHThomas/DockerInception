@@ -1,7 +1,5 @@
 FROM debian:bullseye
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 RUN apt update && apt upgrade -y && apt install -y \
 	nginx \
 	openssl
@@ -13,8 +11,11 @@ RUN mkdir -p /etc/ssl/private && \
         -out /etc/ssl/certs/server.crt \
         -subj "/CN=bthomas.42.fr"
 
-COPY default /etc/nginx/sites-available/.
+COPY default.conf /etc/nginx/sites-available/nginx.conf
+COPY ./startup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/startup.sh
 
 EXPOSE 443
 
+ENTRYPOINT ["/usr/local/bin/startup.sh"]
 CMD ["nginx", "-g", "daemon off;"]

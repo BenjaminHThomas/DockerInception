@@ -8,13 +8,12 @@ services:
     image: nginx
     pull_policy: never
     container_name: nginx
+    depends_on:
+      - wordpress
     ports:
       - "443:443"
     volumes:
       - web:/var/www/html
-    depends_on:
-      wordpress:
-        condition: service_started
     restart: always
   
   wordpress:
@@ -27,10 +26,8 @@ services:
     container_name: wordpress
     pull_policy: never
     depends_on:
-      mariadb:
-        condition: service_healthy
-      redis: 
-        condition: service_healthy
+      - mariadb
+      - redis
     volumes:
       - web:/var/www/html
     environment:
@@ -50,9 +47,6 @@ services:
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
-
-      WP_REDIS_HOST: redis
-      WP_REDIS_PORT: 6379
     restart: always
 
   mariadb:
@@ -71,11 +65,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASS}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
     restart: always
   
   redis:
@@ -87,31 +76,6 @@ services:
     image: redis
     pull_policy: never
     container_name: redis
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: always
-  
-  ftp:
-    networks:
-      - inception
-    build:
-      context: requirements/bonus/ftp
-      dockerfile: "Dockerfile"
-    environment:
-      FTP_USER: ${FTP_USER}
-      FTP_PASS: ${FTP_PASS}
-    image: ftp
-    pull_policy: never
-    container_name: ftp
-    volumes:
-      - web:/web_data
-    ports:
-      - "20:20"
-      - "21:21"
-      - "30000-30100:30000-30100"
     restart: always
 
 volumes:
